@@ -1,17 +1,18 @@
 class List
   require 'optparse'
+  @@dir_color = 34
   def initialize
     @options = {}
     OptionParser.new do |o| 
-    o.on("-a","like \"ls -a\""){ @options[:all] = true } 
-    o.on("-l","like \"ls -l\"") { @options[:long] = true}
-    o.parse!(ARGV)
+      o.on("-a","like \"ls -a\""){ @options[:all] = true } 
+      o.on("-l","like \"ls -l\"") { @options[:long] = true}
+      o.parse!(ARGV)
     end
   end
 
   def exec
     options = get_arg
-    dirs = validate(options)
+    dirs = options.count != 0 ? validate(options) : ["."]
     multi_flag =  dirs.count > 2 ? true : false
 
     dirs.each do |dir|
@@ -20,6 +21,7 @@ class List
   end
   
   private
+
   def get_arg
     ARGV
   end
@@ -38,15 +40,27 @@ class List
 
   def display(dir,multi_flag)
     printf("%s:\n", dir) if multi_flag
-    dir_color = 34
-    Dir.foreach(dir) do |f|
-      if File.directory?(f)
-        printf("\e[#{dir_color}m%-10s\e[0m\t", f)
-      else 
-        printf("%-10s\t", f)
-      end
-      print("\n")
+    if @options[:list]
+      display_list(dir)
+    else
+      display_common(dir)
     end
+  end
+
+  def display_list(dir)
+  end
+
+  def display_common(dir) 
+    files =  @options[:all] ? Dir.entries(dir) : Dir.entries(dir).filter{ |file|  file[0] != "." }
+
+    files.each do |file|
+      if File.directory?(file)
+        printf("\e[#{@@dir_color}m%-10s\e[0m\t", file)
+      else 
+        printf("%-10s\t", file)
+      end
+    end
+    print("\n")
   end
 end
 
