@@ -49,34 +49,43 @@ class List
     files = Dir.children(dir).filter{ |file| file[0] != "." }
     # printf("total %s\n", );
     files.each do |file|
-      case File.ftype(file)
-      when "file"
-        stmode = "-"
-      when "directory"
-        stmode = "d"
-      when "characterSpecial"
-        stmode = "c"
-      when "blockSpecial"
-        stmode = "b"
-      when "fifo"
-        stmode = "p"
-      when "link"
-        stmode = "l"
-      when "socket"
-        stmode = "s"
-      else
-        stmode = "?"
-      end
+      line = ""
+      fs = File::Stat.new(file)
 
-      permission = ("%#b" % File.stat(file).world_readable?).delete_prefix("0b")
-      permission = permission.chars
-      p permission
-      (0..2).each {
-        stmode.concat(permission.shift == '1' ? "r" : "-")
-        stmode.concat(permission.shift == '1' ? "w" : "-")
-        stmode.concat(permission.shift == '1' ? "x" : "-")
-      }
-      p stmode
+      stmode = "%o" % fs.mode
+      if stmode.length == 6
+        case stmode[0,2] 
+        when "14"
+          line.concat("s")
+        when "12"
+          line.concat("l")
+        when "10"
+          line.concat("-")
+        end
+      else
+        case stmode[0,1]
+        when "6"
+          line.concat("b")
+        when "4"
+          line.concat("d")
+        when "2"
+          line.concat("c")
+        when "1"
+          line.concat("p")
+        when "0"
+          line.concat("?")
+        end
+      end
+      # permission = permission.chars
+      # (0..2).each {
+      #   stmode.concat(permission.shift == '1' ? "r" : "-")
+      #   stmode.concat(permission.shift == '1' ? "w" : "-")
+      #   stmode.concat(permission.shift == '1' ? "x" : "-")
+      # }
+      # nlink = fs.nlink
+      # p nlink
+      
+      # NOTE: access control list
 
     end
 
