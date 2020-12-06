@@ -62,6 +62,7 @@ class List
         when "10"
           line.concat("-")
         end
+        stmode = stmode[3,3]
       else
         case stmode[0,1]
         when "6"
@@ -75,15 +76,15 @@ class List
         when "0"
           line.concat("?")
         end
+        stmode = stmode[2,3]
       end
-      # permission = permission.chars
-      # (0..2).each {
-      #   stmode.concat(permission.shift == '1' ? "r" : "-")
-      #   stmode.concat(permission.shift == '1' ? "w" : "-")
-      #   stmode.concat(permission.shift == '1' ? "x" : "-")
-      # }
-      # nlink = fs.nlink
-      # p nlink
+      permissions = stmode.chars.map{ |c| ("%b" % c).delete_prefix("0b0").chars }
+      permissions.each do |permission| 
+        line.concat(permission.shift == '1' ? "r" : "-")
+        line.concat(permission.shift == '1' ? "w" : "-")
+        line.concat(permission.shift == '1' ? "x" : "-")
+      end
+      p line
       
       # NOTE: access control list
 
