@@ -49,44 +49,45 @@ class List
     files = Dir.children(dir).filter{ |file| file[0] != "." }
     # printf("total %s\n", );
     files.each do |file|
-      line = ""
+      parsed_info = []
       fs = File::Stat.new(file)
-
+      parsed_stmode = ""
       stmode = "%o" % fs.mode
       if stmode.length == 6
         case stmode[0,2] 
         when "14"
-          line.concat("s")
+          parsed_stmode.concat("s")
         when "12"
-          line.concat("l")
+          parsed_stmode.concat("l")
         when "10"
-          line.concat("-")
+          parsed_stmode.concat("-")
         end
         stmode = stmode[3,3]
       else
         case stmode[0,1]
         when "6"
-          line.concat("b")
+         parsed_stmode.concat("b")
         when "4"
-          line.concat("d")
+          parsed_stmode.concat("d")
         when "2"
-          line.concat("c")
+          parsed_stmode.concat("c")
         when "1"
-          line.concat("p")
+          parsed_stmode.concat("p")
         when "0"
-          line.concat("?")
+          parsed_stmode.concat("?")
         end
         stmode = stmode[2,3]
       end
       permissions = stmode.chars.map{ |c| ("%b" % c).delete_prefix("0b0").chars }
       permissions.each do |permission| 
-        line.concat(permission.shift == '1' ? "r" : "-")
-        line.concat(permission.shift == '1' ? "w" : "-")
-        line.concat(permission.shift == '1' ? "x" : "-")
+        parsed_stmode.concat(permission.shift == '1' ? "r" : "-")
+        parsed_stmode.concat(permission.shift == '1' ? "w" : "-")
+        parsed_stmode.concat(permission.shift == '1' ? "x" : "-")
       end
-      p line
+      parsed_info.push(parsed_stmode)
+      # NOTE:add access control list
       
-      # NOTE: access control list
+      
 
     end
 
