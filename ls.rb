@@ -102,8 +102,26 @@ class List
       size = fs.size
       parsed_info.push(size)
 
-    end
+      ctime = fs.ctime
 
+      month = ctime.strftime("%m")
+      month[0] = (" ") if month[0] == '0'
+      day = ctime.strftime("%e")
+      date = month.concat(" ",day)
+      parsed_info.push(date)
+
+      half_year = 15552000
+      if (ctime - Time.now).abs >= half_year
+        # It needs to be fixed when year becomes 5 digits.
+        year = "%5s" % ctime.year.to_s
+        parsed_info.push(year)
+        p year
+      else
+        time = ctime.strftime("%R")
+        parsed_info.push(time)
+        p time
+      end
+    end
   end
 
   def display_common(dir) 
@@ -116,7 +134,7 @@ class List
       else
         printf("%-10s\t", file)
       end
-      p File.ftype(file)
+      # p File.ftype(file)
     end
     print("\n")
   end
