@@ -85,7 +85,11 @@ class List
         parsed_stmode.concat(permission.shift == '1' ? "x" : "-")
       end
       parsed_info.push(parsed_stmode)
-      # NOTE:add access control list
+      
+      # TODO:add access control list
+      
+      parsed_info.push(fs.nlink)
+
       
       
 
