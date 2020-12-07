@@ -92,6 +92,9 @@ class List
       parsed_info.push(fs.nlink)
       owner = Etc.getpwuid(fs.uid).name
       parsed_info.push(owner)
+      group = Etc.getgrgid(fs.gid).name
+      parsed_info.push(group)
+
     end
 
   end
