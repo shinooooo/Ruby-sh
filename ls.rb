@@ -47,11 +47,14 @@ class List
   end
 
   def display_list(dir)
+    total_blocks = 0
+
     files = Dir.children(dir).filter{ |file| file[0] != "." }
-    # printf("total %s\n", );
     files.each do |file|
-      parsed_info = []
+      parsed_info = [] 
       fs = File::Stat.new(file)
+
+      total_blocks += fs.blocks
 
       parsed_mode = ""
       mode = "%o" % fs.mode
@@ -115,13 +118,14 @@ class List
         # It needs to be fixed when year becomes 5 digits.
         year = "%5s" % ctime.year.to_s
         parsed_info.push(year)
-        p year
       else
         time = ctime.strftime("%R")
         parsed_info.push(time)
-        p time
       end
+      parsed_info.push(file)
+      p parsed_info
     end
+    p "total " + total_blocks.to_s
   end
 
   def display_common(dir) 
