@@ -52,48 +52,55 @@ class List
     files.each do |file|
       parsed_info = []
       fs = File::Stat.new(file)
-      parsed_stmode = ""
-      stmode = "%o" % fs.mode
-      if stmode.length == 6
-        case stmode[0,2] 
+
+      parsed_mode = ""
+      mode = "%o" % fs.mode
+      if mode.length == 6
+        case mode[0,2] 
         when "14"
-          parsed_stmode.concat("s")
+          parsed_mode.concat("s")
         when "12"
-          parsed_stmode.concat("l")
+          parsed_mode.concat("l")
         when "10"
-          parsed_stmode.concat("-")
+          parsed_mode.concat("-")
         end
-        stmode = stmode[3,3]
+        mode = mode[3,3]
       else
-        case stmode[0,1]
+        case mode[0,1]
         when "6"
-         parsed_stmode.concat("b")
+         parsed_mode.concat("b")
         when "4"
-          parsed_stmode.concat("d")
+          parsed_mode.concat("d")
         when "2"
-          parsed_stmode.concat("c")
+          parsed_mode.concat("c")
         when "1"
-          parsed_stmode.concat("p")
+          parsed_mode.concat("p")
         when "0"
-          parsed_stmode.concat("?")
+          parsed_mode.concat("?")
         end
-        stmode = stmode[2,3]
+        mode = mode[2,3]
       end
-      permissions = stmode.chars.map{ |c| ("%b" % c).delete_prefix("0b0").chars }
+      permissions = mode.chars.map{ |c| ("%b" % c).delete_prefix("0b0").chars }
       permissions.each do |permission| 
-        parsed_stmode.concat(permission.shift == '1' ? "r" : "-")
-        parsed_stmode.concat(permission.shift == '1' ? "w" : "-")
-        parsed_stmode.concat(permission.shift == '1' ? "x" : "-")
+        parsed_mode.concat(permission.shift == '1' ? "r" : "-")
+        parsed_mode.concat(permission.shift == '1' ? "w" : "-")
+        parsed_mode.concat(permission.shift == '1' ? "x" : "-")
       end
-      parsed_info.push(parsed_stmode)
+      parsed_info.push(parsed_mode)
       
       # TODO:add access control list
       
+      nlink = fs.nlink
       parsed_info.push(fs.nlink)
+
       owner = Etc.getpwuid(fs.uid).name
       parsed_info.push(owner)
+
       group = Etc.getgrgid(fs.gid).name
       parsed_info.push(group)
+
+      size = fs.size
+      parsed_info.push(size)
 
     end
 
