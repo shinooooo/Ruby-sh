@@ -1,5 +1,6 @@
 class List
   require 'optparse'
+  require 'etc'
   @@dir_color = 34
   def initialize
     @options = {}
@@ -89,10 +90,8 @@ class List
       # TODO:add access control list
       
       parsed_info.push(fs.nlink)
-
-      
-      
-
+      owner = Etc.getpwuid(fs.uid).name
+      parsed_info.push(owner)
     end
 
   end
