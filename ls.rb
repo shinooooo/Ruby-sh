@@ -49,9 +49,9 @@ class List
   def display_list(dir)
     total_blocks = 0
 
-    files = Dir.children(dir).filter{ |file| file[0] != "." }
+    files = Dir.children(dir).filter{ |file| file[0] != "." }.sort
     files.each do |file|
-      parsed_info = [] 
+      parsed_info = []
       fs = File::Stat.new(file)
 
       total_blocks += fs.blocks
@@ -129,7 +129,7 @@ class List
   end
 
   def display_common(dir) 
-    files =  @options[:all] ? Dir.entries(dir) : Dir.children(dir).filter{ |file| file[0] != "." }
+    files =  @options[:all] ? Dir.entries(dir).sort : Dir.children(dir).filter{ |file| file[0] != "." }.sort
     files.each do |file|
       if File.directory?(file)
         printf("\e[#{@@dir_color}m%-10s\e[0m\t", file)
