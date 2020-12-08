@@ -149,21 +149,22 @@ class List
   end
 
   def display_common(dir) 
+    columns = `tput cols`.to_i
     files =  @options[:all] ? Dir.entries(dir).sort : Dir.children(dir).filter{ |file| file[0] != "." }.sort
-    files.each do |file|
-      if File.directory?(file)
-        printf("\e[#{@@dir_color}m%-10s\e[0m\t", file)
-      elsif File.symlink?(file)
-        printf("\e[45m%-10s\e[0m\t", file)
-      else
-        printf("%-10s\t", file)
+    name_len = 1
+    files.map { |file| name_len = file.length if name_len < file.length }
+    column_count = columns / (name_len + 1)
+    line_count = files.count/column_count
+    line_count = 1 if line_count == 0
+    (0...line_count).each do |line|
+      (0...column_count).each do |column|
+        # p line_count * column + line
+        printf("%-#{name_len+1}s", files[line_count * column + line])
       end
-      # p File.ftype(file)
+      print("\n")
     end
-    print("\n")
   end
 end
 
 list = List.new
 list.exec
-
