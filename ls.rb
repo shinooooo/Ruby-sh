@@ -28,7 +28,7 @@ class List
   def validate_args(args)
     valid_dir = []
     args.each do |arg|
-      if Dir.exist?()
+      if Dir.exist?(arg)
         valid_dir.push(arg)
       else
         printf("%s: %s: No such file or directory\n",$0 ,arg)
@@ -49,11 +49,14 @@ class List
   def display_list(dir)
     total_blocks = 0
 
+    Dir.chdir(dir) do
+      dir = Dir.pwd
+    end
     files = Dir.children(dir).filter{ |file| file[0] != "." }.sort
     lists = []
     files.each do |file|
       parsed_info = []
-      fs = File::Stat.new(file)
+      fs = File::Stat.new("#{dir}/#{file}")
 
       total_blocks += fs.blocks
 
@@ -150,12 +153,15 @@ class List
 
   def display_common(dir) 
     columns = `tput cols`.to_i
+    Dir.chdir(dir) do
+      dir = Dir.pwd
+    end
     files =  @options[:all] ? Dir.entries(dir).sort : Dir.children(dir).filter{ |file| file[0] != "." }.sort
     name_len = 1
     files.map { |file| name_len = file.length if name_len < file.length }
     column_count = columns / (name_len + 1)
     line_count = files.count/column_count
-    line_count = 1 if line_count == 0
+    line_count = 1 if line_count
     (0...line_count).each do |line|
       (0...column_count).each do |column|
         # p line_count * column + line
