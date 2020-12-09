@@ -167,7 +167,7 @@ class ListSegments
               }
 
     lists.each do |info|
-      printf("%s %#{block_len + 1}s %-#{owner_len}s  %-#{group_len}s %#{size_len + 1}s %s %#{time_len + 1}s %s\n",
+      printf("%s %#{block_len + 1}s %-#{owner_len}s  %-#{group_len}s %#{size_len + 1}s %s %#{time_len}s %s\n",
              info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7])
     end
   end
@@ -186,7 +186,6 @@ class ListSegments
    
     (0...line_count).each do |line|
       (0...column_count).each do |column|
-        # p line_count * column + line
         printf("%-#{name_len+1}s", files[line_count * column + line])
       end
       print("\n")
