@@ -141,7 +141,6 @@ class ListSegments
 
     half_year = 15552000
     if (mtime - Time.now).abs >= half_year
-      # It needs to be fixed when year becomes 5 digits.
       year = mtime.year.to_s
       return date, year
     else
@@ -152,11 +151,13 @@ class ListSegments
   
   def print_list(lists,total_blocks)
     print("total #{total_blocks.to_s}\n")
+
     block_len = 1
     owner_len = 1
     group_len = 1
     size_len = 1
     time_len = 1
+    
     lists.map { |info| 
                       block_len = info[1].length if block_len < info[1].length 
                       owner_len = info[2].length if owner_len < info[2].length
@@ -173,12 +174,16 @@ class ListSegments
 
   def display_normal(dir) 
     columns = `tput cols`.to_i
+    
     files =  @options[:all] ? Dir.entries(dir).sort : Dir.children(dir).filter{ |file| file[0] != "." }.sort
+    
     name_len = 1
     files.map { |file| name_len = file.length if name_len < file.length }
+    
     column_count = columns / (name_len + 1)
     line_count = files.count/column_count
-    line_count = 1 if line_count
+    line_count = 1 if line_count == 0
+   
     (0...line_count).each do |line|
       (0...column_count).each do |column|
         # p line_count * column + line
@@ -195,5 +200,5 @@ class ListSegments
   end
 end
 
-list = ListSegments.new
-list.exec
+list_segments = ListSegments.new
+list_segments.exec
