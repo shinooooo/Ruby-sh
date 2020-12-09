@@ -109,21 +109,21 @@ class List
       size = fs.size.to_s
       parsed_info.push(size)
 
-      ctime = fs.ctime
+      mtime = fs.mtime
 
-      month = ctime.strftime("%m")
+      month = mtime.strftime("%m")
       month[0] = (" ") if month[0] == '0'
-      day = ctime.strftime("%e")
+      day = mtime.strftime("%e")
       date = month.concat(" ",day)
       parsed_info.push(date)
 
       half_year = 15552000
-      if (ctime - Time.now).abs >= half_year
+      if (mtime - Time.now).abs >= half_year
         # It needs to be fixed when year becomes 5 digits.
-        year = "%5s" % ctime.year.to_s
+        year = "%5s" % mtime.year.to_s
         parsed_info.push(year)
       else
-        time = ctime.strftime("%R")
+        time = mtime.strftime("%R")
         parsed_info.push(time)
       end
       parsed_info.push(file)
