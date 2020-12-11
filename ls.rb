@@ -49,7 +49,7 @@ class ListSegments
   def display_list(dir)
     total_blocks = 0
 
-    files = Dir.children(dir).filter{ |file| file[0] != "." }.sort
+    files = get_files(dir)
     lists = []
     files.each do |file|
       parsed_info = []
@@ -175,7 +175,7 @@ class ListSegments
   def display_normal(dir) 
     columns = `tput cols`.to_i
     
-    files =  @options[:all] ? Dir.entries(dir).sort : Dir.children(dir).filter{ |file| file[0] != "." }.sort
+    files = get_files(dir)
     
     name_len = 1
     files.map { |file| name_len = file.length if name_len < file.length }
@@ -186,6 +186,7 @@ class ListSegments
    
     (0...line_count).each do |line|
       (0...column_count).each do |column|
+        # p line_count * column + line
         printf("%-#{name_len+1}s", files[line_count * column + line])
       end
       print("\n")
@@ -196,6 +197,10 @@ class ListSegments
     Dir.chdir(dir) do
       dir = Dir.pwd
     end
+  end
+
+  def get_files(dir)
+    @options[:all] ? Dir.entries(dir).sort : Dir.children(dir).filter{ |file| file[0] != "." }.sort
   end
 end
 
