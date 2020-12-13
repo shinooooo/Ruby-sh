@@ -2,16 +2,14 @@ class ListSegments
   require 'optparse'
   require 'etc'
 
-  def initialize
+  def self.exec
     @options = {}
     OptionParser.new do |o|
       o.on("-a","like \"ls -a\""){ @options[:all] = true } 
       o.on("-l","like \"ls -l\"") { @options[:long] = true}
       o.parse!(ARGV)
     end
-  end
 
-  def exec
     args = get_args
     dirs = args.count != 0 ? validate_args(args) : ["."]
     multi_flag =  dirs.count > 2 ? true : false
@@ -21,11 +19,11 @@ class ListSegments
   end
   
   private
-  def get_args
+  def self.get_args
     ARGV
   end
 
-  def validate_args(args)
+  def self.validate_args(args)
     valid_dir = []
     args.each do |arg|
       if Dir.exist?(arg)
@@ -37,7 +35,7 @@ class ListSegments
     valid_dir
   end
 
-  def display(dir,multi_flag)
+  def self.display(dir,multi_flag)
     printf("%s:\n", dir) if multi_flag
     if @options[:long]
       display_list(dir)
@@ -46,7 +44,7 @@ class ListSegments
     end
   end
 
-  def display_list(dir)
+  def self.display_list(dir)
     total_blocks = 0
 
     files = get_files(dir)
@@ -78,7 +76,7 @@ class ListSegments
       print_list(lists,total_blocks)
   end
 
-  def get_mode(fs)
+  def self.get_mode(fs)
     parsed_mode = ""
     mode = "%o" % fs.mode
     if mode.length == 6
@@ -116,23 +114,23 @@ class ListSegments
      # TODO:add access control list
   end
 
-  def get_nlink(fs)
+  def self.get_nlink(fs)
     nlink = fs.nlink.to_s
   end
 
-  def get_owner(fs)
+  def self.get_owner(fs)
     owner = Etc.getpwuid(fs.uid).name
   end
   
-  def get_group(fs)
+  def self.get_group(fs)
     group = Etc.getgrgid(fs.gid).name
   end
 
-  def get_size(fs)
+  def self.get_size(fs)
     size = fs.size.to_s
   end
 
-  def get_time(fs)
+  def self.get_time(fs)
     mtime = fs.mtime
     month = mtime.strftime("%m")
     month[0] = (" ") if month[0] == '0'
@@ -149,7 +147,7 @@ class ListSegments
     end
   end
   
-  def print_list(lists,total_blocks)
+  def self.print_list(lists,total_blocks)
     print("total #{total_blocks.to_s}\n")
 
     block_len = 1
@@ -172,7 +170,7 @@ class ListSegments
     end
   end
 
-  def display_normal(dir) 
+  def self.display_normal(dir) 
     columns = `tput cols`.to_i
     
     files = get_files(dir)
@@ -193,16 +191,15 @@ class ListSegments
     end
   end
 
-  def get_path(dir)
+  def self.get_path(dir)
     Dir.chdir(dir) do
       dir = Dir.pwd
     end
   end
 
-  def get_files(dir)
+  def self.get_files(dir)
     @options[:all] ? Dir.entries(dir).sort : Dir.children(dir).filter{ |file| file[0] != "." }.sort
   end
 end
 
-list_segments = ListSegments.new
-list_segments.exec
+ListSegments.exec
