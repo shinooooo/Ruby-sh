@@ -6,15 +6,15 @@ class ListSegments
     @options = {}
     OptionParser.new do |o|
       o.on("-a","like \"ls -a\""){ @options[:all] = true } 
-      o.on("-l","like \"ls -l\"") { @options[:long] = true}
+      o.on("-l","like \"ls -l\"") { @options[:long] = true }
       o.parse!(ARGV)
     end
 
     args = get_args
+    multi_flag =  args.count >= 2 ? true : false
     dirs = args.count != 0 ? validate_args(args) : ["."]
-    multi_flag =  dirs.count > 2 ? true : false
     dirs.each do |dir|
-      display(get_path(dir), multi_flag)
+      display(dir, multi_flag)
     end
   end
   
@@ -29,18 +29,18 @@ class ListSegments
       if Dir.exist?(arg)
         valid_dir.push(arg)
       else
-        printf("%s: %s: No such file or directory\n",$0 ,arg)
+        printf("%s: %s: No such file or directory\n", $0, arg)
       end
     end
     valid_dir
   end
 
-  def self.display(dir,multi_flag)
+  def self.display(dir, multi_flag)
     printf("%s:\n", dir) if multi_flag
     if @options[:long]
-      display_list(dir)
+      display_list(get_path(dir))
     else
-      display_normal(dir)
+      display_normal(get_path(dir))
     end
   end
 
@@ -73,7 +73,7 @@ class ListSegments
 
       lists.push(parsed_info)
     end
-      print_list(lists,total_blocks)
+      print_list(lists, total_blocks)
   end
 
   def self.get_mode(fs)
@@ -174,18 +174,20 @@ class ListSegments
     columns = `tput cols`.to_i
     
     files = get_files(dir)
-    
+    files_count = files.length
+
     name_len = 1
     files.map { |file| name_len = file.length if name_len < file.length }
+    total_length = (name_len + 1) * files.count
     
-    column_count = columns / (name_len + 1)
-    line_count = files.count/column_count
+    line_count = (total_length + (columns - 1)) / columns
+    column_count = (files.count + (line_count / 2)) / line_count
     line_count = 1 if line_count == 0
    
     (0...line_count).each do |line|
-      (0...column_count).each do |column|
-        # p line_count * column + line
-        printf("%-#{name_len+1}s", files[line_count * column + line])
+      (0..column_count).each do |column|
+        idx = line_count * column + line
+        printf("%-#{name_len + 1}s", files[idx]) if idx < files_count
       end
       print("\n")
     end
