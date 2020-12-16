@@ -171,15 +171,16 @@ class ListSegments
   end
 
   def self.display_normal(dir) 
-    columns = `tput cols`.to_i
     
     files = get_files(dir)
     files_count = files.length
 
     name_len = 1
     files.map { |file| name_len = file.length if name_len < file.length }
+
     total_length = (name_len + 5) * files.count
-    # ls -G total_length = (name_len + 1) * files.count
+    # case ls -G: total_length = (name_len + 1) * files.count
+    columns = `tput cols`.to_i
 
     line_count = (total_length + (columns - 1)) / columns
     column_count = (files.count + (line_count / 2)) / line_count
@@ -189,13 +190,11 @@ class ListSegments
     (0...line_count).each do |line|
       (0..column_count).each do |column|
         idx = line_count * column + line
-        printf("%-#{name_len + 5}s", files[idx]) if idx < files_count
-        # ls -G printf("%-#{name_len + 1}s", files[idx]) if idx < files_count
+        printf("%-#{name_len}s\t", files[idx]) if idx < files_count
+        # case ls -G: printf("%-#{name_len + 1}s", files[idx]) if idx < files_count
       end
       print("\n")
     end
-
-   
   end
 
   def self.get_path(dir)
