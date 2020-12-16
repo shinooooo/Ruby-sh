@@ -188,7 +188,7 @@ class ListSegments
 
 
     (0...line_count).each do |line|
-      (0..column_count).each do |column|
+      (0...column_count).each do |column|
         idx = line_count * column + line
         printf("%-#{name_len}s\t", files[idx]) if idx < files_count
         # case ls -G: printf("%-#{name_len + 1}s", files[idx]) if idx < files_count
